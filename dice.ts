@@ -121,7 +121,7 @@ var Roll = function (min, max) {
     this.dice = [];
 };
 
-var Dice = function (command, rng) {
+var Dice = function (command, rng?) {
     var self = this;
     self.rolls = [];
     self.stack = [];
@@ -134,9 +134,9 @@ var Dice = function (command, rng) {
     self.operator = {
         // "d" is for standard XdY format dice
         "d": function () {  
-            var arguments = Array.from(arguments);
-            var count = arguments.shift() || new Integer(1);
-            var sides = arguments.shift() || new Integer(6);
+            var args = Array.from(arguments);
+            var count = args.shift() || new Integer(1);
+            var sides = args.shift() || new Integer(6);
 
             count = Math.max(Math.min(count.value, 300), 1);
             sides = Math.max(Math.min(sides.value, 300), 1); // ideally this would be 1000 to allow the rare game use of d1000
@@ -259,9 +259,9 @@ var Dice = function (command, rng) {
         },
         // keep  high
         "kh": function () {
-            var arguments = Array.from(arguments).filter(arg => arg !== undefined);
-            var roll = arguments.shift();
-            var keep = arguments.shift() || new Integer(1);
+            var args = Array.from(arguments).filter(arg => arg !== undefined);
+            var roll = args.shift();
+            var keep = args.shift() || new Integer(1);
 
             var kept = roll.dice.sort((l, r) => l < r).slice(0, keep.value);
             self.kept = self.kept.concat(kept);
@@ -269,9 +269,9 @@ var Dice = function (command, rng) {
         },
         // keep low
         "kl": function () {
-            var arguments = Array.from(arguments).filter(arg => arg !== undefined);
-            var roll = arguments.shift();
-            var keep = arguments.shift() || new Integer(1);
+            var args = Array.from(arguments).filter(arg => arg !== undefined);
+            var roll = args.shift();
+            var keep = args.shift() || new Integer(1);
 
             var kept = roll.dice.sort((l, r) => l > r).slice(0, keep.value);
             self.kept = self.kept.concat(kept);
@@ -279,9 +279,9 @@ var Dice = function (command, rng) {
         },
         // keep greater than
         ">": function () {
-            var arguments = Array.from(arguments).filter(arg => arg !== undefined);
-            var roll = arguments.shift();
-            var keep = arguments.shift();
+            var args = Array.from(arguments).filter(arg => arg !== undefined);
+            var roll = args.shift();
+            var keep = args.shift();
 
             var kept = roll.dice.filter(die => die > keep.value);
             self.kept = self.kept.concat(kept);
@@ -289,17 +289,17 @@ var Dice = function (command, rng) {
         },
         // keep equal to. (eg roll 5 dice and count the 6's)
         "e": function () {
-            var arguments = Array.from(arguments).filter(arg => arg !== undefined);
-            var roll = arguments.shift();
-            var keep = arguments.shift();
+            var args = Array.from(arguments).filter(arg => arg !== undefined);
+            var roll = args.shift();
+            var keep = args.shift();
 
             var kept = roll.dice.filter(die => die === keep.value);
             self.kept = self.kept.concat(kept);
             return new Integer(kept.length);
         },
         "gm": function () {
-            var arguments = Array.from(arguments);
-            var count = arguments.shift() || new Integer(1);
+            var args = Array.from(arguments);
+            var count = args.shift() || new Integer(1);
             count = Math.max(Math.min(count.value, 300), 1);
 
             var sides = [
@@ -555,4 +555,4 @@ Dice.prototype.result = function () {
     return this.stack[0].value;
 };
 
-module.exports = Dice;
+export default Dice;

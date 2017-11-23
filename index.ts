@@ -5,8 +5,7 @@ require('dotenv').config()
 import { Message, TextChannel, Guild, GuildMember, Role } from 'discord.js'
 import { CommandoClient, Command, CommandMessage } from 'discord.js-commando'
 import * as _ from 'lodash'
-import * as Dice from './dice'
-import { connect, GroupDatabase, AliasDatabase } from './db'
+import Dice from './dice'
 import { blacklisted, allChannels, detectGuild, mapToRoles } from './utils'
 import { ChannelManager } from './channel_manager'
 
@@ -16,10 +15,7 @@ let bot = new CommandoClient({
     unknownCommandResponse: false
 });
 
-(async () => {
-    await connect();
-    bot.login(process.env.TOKEN);
-})();
+bot.login(process.env.TOKEN);
 
 bot.registry
     .registerGroup('play', 'Play Commands')
