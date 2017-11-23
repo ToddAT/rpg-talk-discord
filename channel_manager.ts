@@ -18,8 +18,15 @@ export class ChannelManager {
   }
 
   async join(channelNames: string[], member: GuildMember, guild: Guild) {
-    const roles = mapToRoles(channelNames, guild)
-      .filter(role => !member.roles.exists("name", role.name));
+    var roles = mapToRoles(channelNames, guild)
+
+    for (var requested of roles) {
+      if (member.roles.exists('name', requested.name)) {
+        throw Error(`You are already in #${requested.name}`);
+      }
+    }
+
+    roles = roles.filter(role => !member.roles.exists("name", role.name));
 
     if (roles.length == 0) {
       throw Error('No valid channels to join');
