@@ -30,5 +30,4 @@ This is the code for the RPG Talk Discord bot.
 
 ## Running it
 
-1. Run `docker-compose up -d` to start Mongo
 2. Run `yarn start` to start the bot

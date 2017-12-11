@@ -2,7 +2,6 @@ import { CommandMessage, CommandoClient } from 'discord.js-commando'
 import { TextChannel, Message, Guild, GuildMember, Role, User } from 'discord.js';
 import * as _ from 'lodash'
 import { mapToChannels, blacklisted, cleanupChannelName, allChannels, mapToRoles, detectGuild } from './utils'
-import { GroupDatabase, AliasDatabase } from './db'
 
 export class ChannelManager {
   private readonly joinMessageRegex: RegExp = /has joined/;
@@ -19,8 +18,15 @@ export class ChannelManager {
   }
 
   async join(channelNames: string[], member: GuildMember, guild: Guild) {
-    const roles = mapToRoles(channelNames, guild)
-      .filter(role => !member.roles.exists("name", role.name));
+    var roles = mapToRoles(channelNames, guild)
+
+    for (var requested of roles) {
+      if (member.roles.exists('name', requested.name)) {
+        throw Error(`You are already in #${requested.name}`);
+      }
+    }
+
+    roles = roles.filter(role => !member.roles.exists("name", role.name));
 
     if (roles.length == 0) {
       throw Error('No valid channels to join');
@@ -40,24 +46,12 @@ export class ChannelManager {
   }
 
   async resolveNames(channelNames: string[], guild: Guild): Promise<string[]> {
-    for (let i = 0; i < channelNames.length; i++) {
-      const aliases = await AliasDatabase.find({ alias: channelNames[i] })
-      if (aliases.length > 0) {
-        channelNames[i] = aliases[0].real
-      }
-    }
-
     let mappedNames = []
     for (let i = 0; i < channelNames.length; i++) {
       if (channelNames[i] == "all") {
         mappedNames = mappedNames.concat(allChannels(guild));
       } else {
-        let groupsChannels = await GroupDatabase.find({ name: channelNames[i] })
-        if (groupsChannels.length > 0) {
-          mappedNames = mappedNames.concat(groupsChannels[0].channels);
-        } else {
-          mappedNames.push(channelNames[i]);
-        }
+        mappedNames.push(channelNames[i]);
       }
     }
 
